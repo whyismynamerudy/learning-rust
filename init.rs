@@ -122,5 +122,25 @@ fn main() {
 }
 let (left, right) = tuple;
 
+Shared References:
+"borrowing", same as pointers in C. 
+Shared references are read-only, and the referenced data cannot change.
+    let a = 'A';
+    let b = 'B';
+    let mut r: &char = &a;
+    println!("r: {}", *r);
+    r = &b;
+    println!("r: {}", *r);
+above, r cannot alter the value of a/b
+
+Exclusive References:
+Mutable references, allow changing the value they refer to.
+“Exclusive” means that only this reference can be used to access the value. No other references 
+(shared or exclusive) can exist at the same time, and the referenced value cannot be accessed while
+the exclusive reference exists.
+    let mut point = (1, 2);
+    let x_coord = &mut point.0;
+    *x_coord = 20;
+    println!("point: {point:?}");
 
 */
