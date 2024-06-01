@@ -120,4 +120,7 @@ fn main() {
     println!("t.0: {}", t.0);
     println!("t.1: {}", t.1);
 }
+let (left, right) = tuple;
+
+
 */
