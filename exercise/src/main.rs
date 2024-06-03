@@ -7,6 +7,18 @@ fn main() {
     let x: i32 = 21; // this in immutable; variables in rust are immutable by default
     println!("my age is {} and via function is {}.", x, my_age_is());
 
+    let arr: [i32; 5] = [0, 1, 2, 3, 4];
+
+    println!("arr is {arr:?}");
+
+    let slice: &[i32] = &arr[1..4];
+
+    println!("slice s is {slice:?}");
+
+    // arr[3] = 6;
+
+    // println!("slice s after mutating arr is {slice:?}");
+
     // this would not work:
     // x = 22 ( 😔 )
     // println!("{}",fibbi(3));

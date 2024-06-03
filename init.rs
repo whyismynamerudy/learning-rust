@@ -142,5 +142,151 @@ the exclusive reference exists.
     let x_coord = &mut point.0;
     *x_coord = 20;
     println!("point: {point:?}");
+Can't have any other type of refernce to point.0 while there is an &mut ref.
 
+Slices:
+Gives you a view into a larger collection.
+fn main() {
+    let mut a: [i32; 6] = [10, 20, 30, 40, 50, 60];
+    println!("a: {a:?}");
+
+    let s: &[i32] = &a[2..4];
+
+    println!("s: {s:?}");
+}
+Notice that the type of s (&[i32]) no longer mentions the array length. This allows us to perform 
+computation on slices of different sizes.
+Note that you cannot alter a once the slice has been created.
+
+Strings:
+There are two string types in Rust:
+    . &str is a slice of UTF-8 encoded bytes, similar to &[u8].
+    . String is an owned buffer of UTF-8 encoded bytes, similar to Vec<T>.
+fn main() {
+    let s1: &str = "World";  // this is an imutable reference to string (string literal)
+    println!("s1: {s1}");
+
+    let mut s2: String = String::from("Hello "); // owned, creates a string from string literal
+    println!("s2: {s2}");
+    s2.push_str(s1);
+    println!("s2: {s2}");
+
+    let s3: &str = &s2[s2.len() - s1.len()..];
+    println!("s3: {s3}");
+}
+
+ON TO STRUCTS!!
+
+Named Structs:
+struct Person {
+    name: String,
+    age: u8,
+}
+
+fn describe(person: &Person) {
+    println!("{} is {} years old", person.name, person.age);
+}
+
+fn main() {
+    let mut peter = Person { name: String::from("Peter"), age: 27 };
+    describe(&peter);
+
+    peter.age = 28;
+    describe(&peter);
+
+    let name = String::from("Avery");
+    let age = 39;
+    let avery = Person { name, age };
+    describe(&avery);
+
+    let jackie = Person { name: String::from("Jackie"), ..avery };
+    describe(&jackie);
+}
+The syntax ..avery allows us to copy the majority of the fields from the old struct without having 
+to explicitly type it all out. It must always be the last element.
+
+Tuple Structs:
+Use when field names are unimportant.
+struct Point(i32, i32);
+Often used for single-field wrappers:
+struct PoundsOfForce(f64);
+struct Newtons(f64);
+
+Enums:
+'enum; keyword allows for the creation of a type with a few variants:
+#[derive(Debug)]
+enum Direction {
+    Left,
+    Right,
+}
+
+#[derive(Debug)]
+enum PlayerMove {
+    Pass,                        // Simple variant
+    Run(Direction),              // Tuple variant
+    Teleport { x: u32, y: u32 }, // Struct variant
+}
+
+fn main() {
+    let m: PlayerMove = PlayerMove::Run(Direction::Left);
+    println!("On this turn: {:?}", m);
+}
+Enumerations allow you to collect a set of values under one type.
+
+Static:
+Static variables will live during the whole execution of the program.
+static BANNER: &str = "Welcome to RustOS 3.14";
+
+fn main() {
+    println!("{BANNER}");
+}
+
+Const:
+Constants are evaluated at compile time and their values are inlined wherever they are used:
+const DIGEST_SIZE: usize = 3;
+const ZERO: Option<u8> = Some(42);
+
+fn compute_digest(text: &str) -> [u8; DIGEST_SIZE] {
+    let mut digest = [ZERO.unwrap_or(0); DIGEST_SIZE];
+    for (idx, &b) in text.as_bytes().iter().enumerate() {
+        digest[idx % DIGEST_SIZE] = digest[idx % DIGEST_SIZE].wrapping_add(b);
+    }
+    digest
+}
+
+fn main() {
+    let digest = compute_digest("Hello");
+    println!("digest: {digest:?}");
+}
+
+Const vs Static:
+A constant in Rust is immutable. You neither can reassign nor modify it.
+A static variable can be mutable and therefore can either be modified or reassigned. Note that 
+writing/modifying a global static variable is unsafe and therefore needs an unsafe block.
+When you compile a binary, all const "occurrences" (where you use that const in your source code) will be replaced by that value directly.
+statics will have a dedicated section in your binary where they will be placed.
+In conclusion, 
+const:
+    . Have no fixed address in memory
+    . They’re inlined to each place which uses them, this means they are put directly into the binary on the places which use them.
+    . Usually faster runtime but bigger executable file because it doesn't have to look up an address like static
+static:
+    . Have a fixed address in memory
+    . Their value is loaded from this fixed address each place which uses them.
+    . Usually slower runtime because we need to perform the extra instruction of loading the data from the fixed address. However this 
+      could result in a smaller executable file (only when it is used frequently) because it doesn't have to have multiple copies of 
+      the value baked into the executable.
+
+Type Aliases:
+enum CarryableConcreteItem {
+    Left,
+    Right,
+}
+
+type Item = CarryableConcreteItem;
+
+// Aliases are more useful with long, complex types:
+use std::cell::RefCell;
+use std::sync::{Arc, RwLock};
+type PlayerInventory = RwLock<Vec<Arc<RefCell<Item>>>>;
 */
